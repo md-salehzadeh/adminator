@@ -65,7 +65,9 @@ func FilePackages() (packages []Package) {
 	jsonData, err := ioutil.ReadFile(configFile)
 
 	if err != nil {
-		panic(err)
+		fmt.Println("packages.json does not exist please run `command` first")
+
+		return
 	}
 
 	json.Unmarshal(jsonData, &packages)
