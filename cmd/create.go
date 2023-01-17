@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -15,7 +14,7 @@ var createCmd = &cobra.Command{
 	Short: "Create the packages file",
 	Long:  `Create the packages file`,
 	Run: func(cmd *cobra.Command, args []string) {
-		runCreate()
+		runCreateCmd()
 	},
 }
 
@@ -23,11 +22,10 @@ func init() {
 	pkgsCmd.AddCommand(createCmd)
 }
 
-func runCreate() {
-	packages := SystemPackages()
+func runCreateCmd() {
+	packages := SystemPkgs()
 
-	fmt.Printf("Length is %d Capacity is %d\n", len(packages), cap(packages))
-	fmt.Println(packages)
+	fmt.Printf("Number of %d packages stored in '~/.config/%s/packages.json'", len(packages), CONFIG_NAME)
 
 	writeToFile(packages)
 }
@@ -39,13 +37,7 @@ func writeToFile(packages []Package) {
 		panic(err)
 	}
 
-	configDir := filepath.Join(os.Getenv("HOME"), ".config", "packages")
-	
-	if _, err := os.Stat(configDir); os.IsNotExist(err) {
-		os.MkdirAll(configDir, os.ModePerm)
-	}
-
-	configFile := filepath.Join(configDir, "packages.json")
+	configFile := filepath.Join(ConfigDir(), "packages.json")
 
 	err = ioutil.WriteFile(configFile, jsonData, 0644)
 
