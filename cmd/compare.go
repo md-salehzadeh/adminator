@@ -50,11 +50,11 @@ func runCompare(cmd *cobra.Command) {
 
 	fmt.Println("\n----------------------")
 
-	apply, err := cmd.Flags().GetBool("apply")
-
-	if err != nil {
-		panic(err)
+	if len(installPkgs) == 0 || len(uninstallPkgs) == 0 {
+		return
 	}
+
+	apply, _ := cmd.Flags().GetBool("apply")
 
 	if (apply) {
 		fmt.Println("\nnow applying changes")
