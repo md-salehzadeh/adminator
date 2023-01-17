@@ -1,4 +1,4 @@
-module github.com/pacManager
+module github.com/adminator
 
 go 1.18
 

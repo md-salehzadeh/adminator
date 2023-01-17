@@ -1,1 +1,1 @@
-# pacManager
+# Adminator
