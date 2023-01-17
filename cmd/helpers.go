@@ -32,17 +32,49 @@ func SystemPkgs() (packages []Package) {
 
 	lines := strings.Split(string(stdout), "\n")
 
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
+	for _, pkg := range lines {
+		pkg = strings.TrimSpace(pkg)
 
-		if line == "" {
+		if pkg == "" {
 			continue
 		}
 
+		cmd = exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkg))
+
+		stdout, err := cmd.Output()
+
+		if err != nil {
+			if err.Error() != "exit status 1" {
+				fmt.Println(err.Error())
+
+				return
+			}
+		}
+
+		searchResult := strings.TrimSpace(string(stdout))
+
+		var pkgType string
+
+		if len(searchResult) > 0 {
+			pkgType = "Pacman"
+		} else {
+			pkgType = "AUR"
+		}
+
+		pkgsWithoutDep := []string{"composer", "phpmyadmin"}
+
+		var pkgArgs string
+
+		if Contains(pkgsWithoutDep, pkg) {
+			pkgArgs = "Sdd"
+		} else {
+			pkgArgs = "S"
+		}
+
 		packages = append(packages, Package{
-			Name: line,
-			Type: "Pacman",
-			Args: "S",
+			Name: pkg,
+			Type: pkgType,
+			Args: pkgArgs,
 		})
 	}
 
@@ -104,4 +136,14 @@ func ComparePkgs() (installPkgs []Package, uninstallPkgs []Package) {
 
 func ApplyPkgs(installPkgs []Package, uninstallPkgs []Package) {
 	fmt.Println("\nnow applying changes")
+}
+
+func Contains(list []string, str string) bool {
+	for _, item := range list {
+		if item == str {
+			return true
+		}
+	}
+
+	return false
 }
