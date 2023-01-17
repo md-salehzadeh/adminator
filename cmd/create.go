@@ -3,8 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"strings"
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
@@ -26,43 +24,12 @@ func init() {
 }
 
 func runCreate() {
-	packages := getPackages()
+	packages := SystemPackages()
 
 	fmt.Printf("Length is %d Capacity is %d\n", len(packages), cap(packages))
 	fmt.Println(packages)
 
 	writeToFile(packages)
-}
-
-type Package struct {
-	Name string
-	Type string
-	Args string
-}
-
-func getPackages() (packages []Package) {
-	cmd := exec.Command("pacman", "-Qqe")
-
-	stdout, err := cmd.Output()
-
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-
-	lines := strings.Split(string(stdout), "\n")
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-
-		if line == "" {
-			continue
-		}
-
-		packages = append(packages, Package{Name: line, Type: "Pacman", Args: "S"})
-	}
-
-	return
 }
 
 func writeToFile(packages []Package) {
