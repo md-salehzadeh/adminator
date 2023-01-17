@@ -23,7 +23,7 @@ func init() {
 }
 
 func runCreateCmd() {
-	packages := SystemPkgs()
+	packages := SystemPkgs(true)
 
 	fmt.Printf("Number of %d packages stored in '~/.config/%s/packages.json'", len(packages), CONFIG_NAME)
 

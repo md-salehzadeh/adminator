@@ -19,7 +19,7 @@ func ConfigDir() (configDir string) {
 	return
 }
 
-func SystemPkgs() (packages []Package) {
+func SystemPkgs(getType bool) (packages []Package) {
 	cmd := exec.Command("pacman", "-Qqe")
 
 	stdout, err := cmd.Output()
@@ -39,26 +39,28 @@ func SystemPkgs() (packages []Package) {
 			continue
 		}
 
-		cmd = exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkg))
-
-		stdout, err := cmd.Output()
-
-		if err != nil {
-			if err.Error() != "exit status 1" {
-				fmt.Println(err.Error())
-
-				return
-			}
-		}
-
-		searchResult := strings.TrimSpace(string(stdout))
-
 		var pkgType string
 
-		if len(searchResult) > 0 {
-			pkgType = "Pacman"
-		} else {
-			pkgType = "AUR"
+		if getType {
+			cmd = exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkg))
+
+			stdout, err := cmd.Output()
+
+			if err != nil {
+				if err.Error() != "exit status 1" {
+					fmt.Println(err.Error())
+
+					return
+				}
+			}
+
+			searchResult := strings.TrimSpace(string(stdout))
+
+			if len(searchResult) > 0 {
+				pkgType = "Pacman"
+			} else {
+				pkgType = "AUR"
+			}
 		}
 
 		pkgsWithoutDep := []string{"composer", "phpmyadmin"}
@@ -98,7 +100,7 @@ func FilePkgs() (packages []Package) {
 }
 
 func ComparePkgs() (installPkgs []Package, uninstallPkgs []Package) {
-	systemPkgs := SystemPkgs()
+	systemPkgs := SystemPkgs(false)
 	filePkgs := FilePkgs()
 
 	for _, filePkg := range filePkgs {
