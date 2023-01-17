@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/manifoldco/promptui"
 )
 
 func ConfigDir() (configDir string) {
@@ -138,6 +141,59 @@ func ComparePkgs() (installPkgs []Package, uninstallPkgs []Package) {
 
 func ApplyPkgs(installPkgs []Package, uninstallPkgs []Package) {
 	fmt.Println("\nnow applying changes")
+
+	for _, pkg := range installPkgs {
+		fmt.Printf("paru -%s %s\n\n", pkg.Args, pkg.Name)
+
+		prompt := promptui.Prompt{
+			Label: "Proceed with installation? [Y/n]",
+			Validate: func(input string) error {
+				if input != "Y" && input != "n" {
+					return errors.New("not a valid option [Y/n]")
+				}
+
+				return nil
+			},
+		}
+
+		confirmResult, _ := prompt.Run()
+
+		if confirmResult != "Y" {
+			continue
+		}
+
+		// cmd := exec.Command("paru", "-S", "calc")
+
+		// // some command output will be input into stderr
+		// // e.g.
+		// // cmd := exec.Command("../../bin/master_build")
+		// // stderr, err := cmd.StderrPipe()
+
+		// stdout, err := cmd.StdoutPipe()
+
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+
+		// err = cmd.Start()
+
+		// fmt.Println("The command is running")
+
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+
+		// // print the output of the subprocess
+		// scanner := bufio.NewScanner(stdout)
+
+		// for scanner.Scan() {
+		// 	m := scanner.Text()
+
+		// 	fmt.Println(m)
+		// }
+
+		// cmd.Wait()
+	}
 }
 
 func Contains(list []string, str string) bool {

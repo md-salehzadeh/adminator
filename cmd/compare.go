@@ -50,7 +50,7 @@ func runCompareCmd(cmd *cobra.Command) {
 
 	fmt.Println("\n----------------------")
 
-	if len(installPkgs) == 0 || len(uninstallPkgs) == 0 {
+	if len(installPkgs) == 0 && len(uninstallPkgs) == 0 {
 		return
 	}
 
