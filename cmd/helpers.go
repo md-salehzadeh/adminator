@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -53,7 +52,7 @@ func SystemPkgs() (packages []Package) {
 func FilePkgs() (packages []Package) {
 	configFile := filepath.Join(ConfigDir(), "packages.json")
 
-	jsonData, err := ioutil.ReadFile(configFile)
+	jsonData, err := os.ReadFile(configFile)
 
 	if err != nil {
 		fmt.Println("packages.json does not exist please run `command` first")

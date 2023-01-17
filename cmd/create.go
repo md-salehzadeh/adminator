@@ -3,7 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -39,7 +39,7 @@ func writeToFile(packages []Package) {
 
 	configFile := filepath.Join(ConfigDir(), "packages.json")
 
-	err = ioutil.WriteFile(configFile, jsonData, 0644)
+	err = os.WriteFile(configFile, jsonData, 0644)
 
 	if err != nil {
 		panic(err)
