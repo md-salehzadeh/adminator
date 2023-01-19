@@ -15,7 +15,7 @@ type File struct {
 }
 
 type Service struct {
-	Type   string
-	Name   string
-	Status string
+	Type    string
+	Name    string
+	Enabled bool
 }

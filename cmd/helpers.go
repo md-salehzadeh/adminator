@@ -202,7 +202,23 @@ func FilesConfig() (items []File) {
 	jsonData, err := os.ReadFile(configFile)
 
 	if err != nil {
-		fmt.Println("files.json does not exist please make the file first")
+		fmt.Println("files.json does not exist please make the config file first")
+
+		return
+	}
+
+	json.Unmarshal(jsonData, &items)
+
+	return
+}
+
+func ServicesConfig() (items []Service) {
+	configFile := filepath.Join(ConfigDir(), "services.json")
+
+	jsonData, err := os.ReadFile(configFile)
+
+	if err != nil {
+		fmt.Println("services.json does not exist please make the config file first")
 
 		return
 	}
