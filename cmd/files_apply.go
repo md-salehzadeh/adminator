@@ -64,37 +64,31 @@ func (item File) createFile(needsSudo bool) {
 }
 
 func (item File) linkFile(configDir string, needsSudo bool) {
-	source := filepath.Join(configDir, "files", item.Path)
-
-	createLink := false
-
-	if info, err := os.Lstat(item.Path); os.IsNotExist(err) {
-		createLink = true
-	} else if err != nil {
-		fmt.Printf("Error checking if %s exists: %v\n", item.Path, err)
-	} else if info.Mode()&os.ModeSymlink != 0 {
-		var cmd *exec.Cmd
-
-		if needsSudo {
-			cmd = exec.Command("sudo", "rm", "-f", item.Path)
-		} else {
-			cmd = exec.Command("rm", "-f", item.Path)
-		}
-
-		cmd.Run()
-
-		createLink = true
+	if item.Source == "" {
+		item.Source = filepath.Join(configDir, "files", item.Path)
 	}
 
-	if _, err := os.Stat(source); !os.IsNotExist(err) && createLink {
-		var cmd *exec.Cmd
+	if _, err := os.Stat(item.Source); os.IsNotExist(err) {
+		fmt.Printf("Source path '%s' doesn't exists\n", item.Source)
 
-		if needsSudo {
-			cmd = exec.Command("sudo", "ln", "-s", source, item.Path)
-		} else {
-			cmd = exec.Command("ln", "-s", source, item.Path)
-		}
-
-		cmd.Run()
+		return
 	}
+
+	var cmd *exec.Cmd
+
+	if needsSudo {
+		cmd = exec.Command("sudo", "rm", "-f", item.Path)
+	} else {
+		cmd = exec.Command("rm", "-f", item.Path)
+	}
+
+	cmd.Run()
+
+	if needsSudo {
+		cmd = exec.Command("sudo", "ln", "-s", item.Source, item.Path)
+	} else {
+		cmd = exec.Command("ln", "-s", item.Source, item.Path)
+	}
+
+	cmd.Run()
 }
