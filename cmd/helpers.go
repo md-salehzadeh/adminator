@@ -196,6 +196,22 @@ func ApplyPkgs(installPkgs []Package, uninstallPkgs []Package) {
 	}
 }
 
+func FilesConfig() (items []File) {
+	configFile := filepath.Join(ConfigDir(), "files.json")
+
+	jsonData, err := os.ReadFile(configFile)
+
+	if err != nil {
+		fmt.Println("files.json does not exist please make the file first")
+
+		return
+	}
+
+	json.Unmarshal(jsonData, &items)
+
+	return
+}
+
 func Contains(list []string, str string) bool {
 	for _, item := range list {
 		if item == str {

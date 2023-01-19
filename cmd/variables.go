@@ -7,3 +7,15 @@ type Package struct {
 	Type string
 	Args string
 }
+
+type File struct {
+	Type   string
+	Source string
+	Path   string
+}
+
+type Service struct {
+	Type   string
+	Name   string
+	Status string
+}
