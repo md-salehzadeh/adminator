@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -58,8 +58,17 @@ func (item File) createFile(needsSudo bool) {
 		cmd.Run()
 
 		if _, err := os.Stat(item.Path); os.IsNotExist(err) {
-			fmt.Printf("couldn't create directory '%s'", item.Path)
+			pterm.Error.Printf("Create: couldn't create directory `%s`", item.Path)
+			pterm.Println()
+
+			return
 		}
+
+		pterm.Success.Printf("Create: Directory `%s` created", item.Path)
+		pterm.Println()
+	} else {
+		pterm.Warning.Printf("Create: Directory `%s` already exists", item.Path)
+		pterm.Println()
 	}
 }
 
@@ -69,7 +78,8 @@ func (item File) linkFile(configDir string, needsSudo bool) {
 	}
 
 	if _, err := os.Stat(item.Source); os.IsNotExist(err) {
-		fmt.Printf("Source path '%s' doesn't exists\n", item.Source)
+		pterm.Error.Printf("Link: Source path `%s` doesn't exists", item.Source)
+		pterm.Println()
 
 		return
 	}
@@ -89,6 +99,9 @@ func (item File) linkFile(configDir string, needsSudo bool) {
 	} else {
 		cmd = exec.Command("ln", "-s", item.Source, item.Path)
 	}
+
+	pterm.Success.Printf("Link: `%s` -> `%s`", item.Source, item.Path)
+	pterm.Println()
 
 	cmd.Run()
 }
