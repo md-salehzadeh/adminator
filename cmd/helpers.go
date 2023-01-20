@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -99,6 +100,10 @@ func SystemPkgs(getType bool) (packages []Package) {
 	}
 
 	wg.Wait()
+
+	sort.Slice(packages, func(i, j int) bool {
+		return packages[i].Name < packages[j].Name
+	})
 
 	return
 }
