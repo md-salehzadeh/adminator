@@ -28,6 +28,8 @@ func runFilesApplyCmd(cmd *cobra.Command) {
 
 	filesConfig := FilesConfig()
 
+	pterm.Println()
+
 	for _, item := range filesConfig {
 		needsSudo := true
 
