@@ -38,6 +38,8 @@ func SystemPkgs(getType bool) (packages []Package) {
 
 	var wg sync.WaitGroup
 
+	var mutex = &sync.Mutex{}
+
 	for _, pkg := range lines {
 		wg.Add(1)
 
@@ -84,11 +86,15 @@ func SystemPkgs(getType bool) (packages []Package) {
 				pkgArgs = "S"
 			}
 
+			mutex.Lock()
+
 			packages = append(packages, Package{
 				Name: pkg,
 				Type: pkgType,
 				Args: pkgArgs,
 			})
+
+			mutex.Unlock()
 		}(pkg)
 	}
 
