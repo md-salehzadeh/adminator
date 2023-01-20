@@ -17,8 +17,6 @@ var compareCmd = &cobra.Command{
 
 func init() {
 	pkgsCmd.AddCommand(compareCmd)
-
-	compareCmd.Flags().BoolP("apply", "a", false, "whether to apply the changes or not")
 }
 
 func runCompareCmd(cmd *cobra.Command) {
@@ -32,7 +30,7 @@ func runCompareCmd(cmd *cobra.Command) {
 		fmt.Println("Install Packages:")
 
 		for _, pkg := range installPkgs {
-			fmt.Printf("\n%s", pkg.Name)
+			fmt.Printf("\nparu -%s %s", pkg.Args, pkg.Name)
 		}
 	}
 
@@ -44,7 +42,7 @@ func runCompareCmd(cmd *cobra.Command) {
 		fmt.Println("Uninstall Packages:")
 
 		for _, pkg := range uninstallPkgs {
-			fmt.Printf("\n%s", pkg.Name)
+			fmt.Printf("\npacman -D --asexplicit %s", pkg.Name)
 		}
 	}
 
@@ -54,9 +52,5 @@ func runCompareCmd(cmd *cobra.Command) {
 		return
 	}
 
-	apply, _ := cmd.Flags().GetBool("apply")
-
-	if apply {
-		ApplyPkgs(installPkgs, uninstallPkgs)
-	}
+	fmt.Println("\nnow tun `pacman -Rns $(pacman -Qtdq)`")
 }
