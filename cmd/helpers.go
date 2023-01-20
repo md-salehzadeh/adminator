@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/manifoldco/promptui"
 )
@@ -35,53 +36,63 @@ func SystemPkgs(getType bool) (packages []Package) {
 
 	lines := strings.Split(string(stdout), "\n")
 
+	var wg sync.WaitGroup
+
 	for _, pkg := range lines {
-		pkg = strings.TrimSpace(pkg)
+		wg.Add(1)
 
-		if pkg == "" {
-			continue
-		}
+		go func(pkg string) {
+			defer wg.Done()
 
-		var pkgType string
+			pkg = strings.TrimSpace(pkg)
 
-		if getType {
-			cmd = exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkg))
+			if pkg == "" {
+				return
+			}
 
-			stdout, err := cmd.Output()
+			var pkgType string
 
-			if err != nil {
-				if err.Error() != "exit status 1" {
-					fmt.Println(err.Error())
+			if getType {
+				cmd = exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkg))
 
-					return
+				stdout, err := cmd.Output()
+
+				if err != nil {
+					if err.Error() != "exit status 1" {
+						fmt.Println(err.Error())
+
+						return
+					}
+				}
+
+				searchResult := strings.TrimSpace(string(stdout))
+
+				if len(searchResult) > 0 {
+					pkgType = "Pacman"
+				} else {
+					pkgType = "AUR"
 				}
 			}
 
-			searchResult := strings.TrimSpace(string(stdout))
+			pkgsWithoutDep := []string{"composer", "phpmyadmin"}
 
-			if len(searchResult) > 0 {
-				pkgType = "Pacman"
+			var pkgArgs string
+
+			if Contains(pkgsWithoutDep, pkg) {
+				pkgArgs = "Sdd"
 			} else {
-				pkgType = "AUR"
+				pkgArgs = "S"
 			}
-		}
 
-		pkgsWithoutDep := []string{"composer", "phpmyadmin"}
-
-		var pkgArgs string
-
-		if Contains(pkgsWithoutDep, pkg) {
-			pkgArgs = "Sdd"
-		} else {
-			pkgArgs = "S"
-		}
-
-		packages = append(packages, Package{
-			Name: pkg,
-			Type: pkgType,
-			Args: pkgArgs,
-		})
+			packages = append(packages, Package{
+				Name: pkg,
+				Type: pkgType,
+				Args: pkgArgs,
+			})
+		}(pkg)
 	}
+
+	wg.Wait()
 
 	return
 }
