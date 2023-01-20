@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -28,8 +29,6 @@ func runServicesApplyCmd(cmd *cobra.Command) {
 		_, err := item.getStatus()
 
 		if err != nil {
-			fmt.Println(err)
-
 			continue
 		}
 
@@ -50,8 +49,20 @@ func runServicesApplyCmd(cmd *cobra.Command) {
 		}
 
 		cmd.Run()
+	}
 
-		// fmt.Printf("Service %s status: %s\n", item.Name, status)
+	for _, item := range servicesConfig {
+		status, err := item.getStatus()
+
+		if err != nil {
+			pterm.Println()
+			pterm.Error.Printf("Service `%s` -> %s", item.Name, err)
+
+			continue
+		}
+
+		pterm.Println()
+		pterm.Success.Printf("Service `%s` -> %s", item.Name, status)
 	}
 }
 
@@ -71,10 +82,10 @@ func (item Service) getStatus() (status string, error error) {
 			} else if strings.Contains(output, "Active: failed") {
 				status = "failed"
 			} else {
-				error = fmt.Errorf("error: %s", exitError.Stderr)
+				error = fmt.Errorf("%s", strings.TrimSpace(string(exitError.Stderr)))
 			}
 		} else {
-			error = fmt.Errorf("error: %s", err.Error())
+			error = fmt.Errorf("%s", err.Error())
 		}
 	} else {
 		if strings.Contains(output, "Active: active") {
