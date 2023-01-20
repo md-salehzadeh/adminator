@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -23,11 +23,18 @@ func init() {
 }
 
 func runCreateCmd() {
+	pterm.Println()
+
+	spinnerInfo, _ := pterm.DefaultSpinner.Start("Gathering info about system packages ...")
+
 	packages := SystemPkgs(true)
 
-	fmt.Printf("Number of %d packages stored in '~/.config/%s/packages.json'", len(packages), CONFIG_NAME)
+	spinnerInfo.Info()
 
 	writeToFile(packages)
+
+	pterm.Println()
+	pterm.Success.Printf("Number of %d packages stored in `~/.config/%s/packages.json`", len(packages), CONFIG_NAME)
 }
 
 func writeToFile(packages []Package) {
