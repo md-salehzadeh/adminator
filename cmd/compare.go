@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -22,35 +23,43 @@ func init() {
 func runCompareCmd(cmd *cobra.Command) {
 	installPkgs, uninstallPkgs := ComparePkgs()
 
-	fmt.Println("----------------------")
+	pterm.DefaultSection.Println("Install Packages")
+
+	var bullteItems []pterm.BulletListItem
 
 	if len(installPkgs) == 0 {
-		fmt.Println("No packages need to be installed")
+		pterm.FgLightMagenta.Println("No packages need to be installed")
 	} else {
-		fmt.Println("Install Packages:")
-
 		for _, pkg := range installPkgs {
-			fmt.Printf("\nparu -%s %s", pkg.Args, pkg.Name)
+			bullteItems = append(bullteItems, pterm.BulletListItem{
+				Level: 0,
+				Text:  fmt.Sprintf("paru -%s %s", pkg.Args, pkg.Name),
+			})
 		}
 	}
 
-	fmt.Println("\n----------------------")
+	pterm.DefaultBulletList.WithItems(bullteItems).Render()
+
+	pterm.DefaultSection.Println("Uninstall Packages")
+
+	bullteItems = make([]pterm.BulletListItem, 0)
 
 	if len(uninstallPkgs) == 0 {
-		fmt.Println("No packages need to be uninstalled")
+		pterm.FgLightMagenta.Println("No packages need to be uninstalled")
 	} else {
-		fmt.Println("Uninstall Packages:")
-
 		for _, pkg := range uninstallPkgs {
-			fmt.Printf("\nsudo pacman -D --asdeps %s", pkg.Name)
+			bullteItems = append(bullteItems, pterm.BulletListItem{
+				Level: 0,
+				Text:  fmt.Sprintf("sudo pacman -D --asdeps %s", pkg.Name),
+			})
 		}
 	}
 
-	fmt.Println("\n----------------------")
+	pterm.DefaultBulletList.WithItems(bullteItems).Render()
 
 	if len(installPkgs) == 0 && len(uninstallPkgs) == 0 {
 		return
 	}
 
-	fmt.Println("\nnow tun `sudo pacman -Rns $(pacman -Qtdq)`")
+	pterm.FgLightBlue.Println("\nnow tun -> sudo pacman -Rns $(pacman -Qtdq)")
 }
