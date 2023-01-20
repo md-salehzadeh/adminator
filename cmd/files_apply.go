@@ -50,9 +50,9 @@ func (item File) createFile(needsSudo bool) {
 		var cmd *exec.Cmd
 
 		if needsSudo {
-			cmd = exec.Command("sudo", "mkdir", item.Path)
+			cmd = exec.Command("sudo", "mkdir", "-p", item.Path)
 		} else {
-			cmd = exec.Command("mkdir", item.Path)
+			cmd = exec.Command("mkdir", "-p", item.Path)
 		}
 
 		cmd.Run()

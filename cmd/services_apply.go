@@ -35,10 +35,18 @@ func runServicesApplyCmd(cmd *cobra.Command) {
 
 		var cmd *exec.Cmd
 
-		if item.Enabled {
-			cmd = exec.Command("sudo", "systemctl", "enable", item.Name)
+		if item.Type == "system" {
+			if item.Enabled {
+				cmd = exec.Command("sudo", "systemctl", "enable", item.Name)
+			} else {
+				cmd = exec.Command("sudo", "systemctl", "disable", item.Name)
+			}
 		} else {
-			cmd = exec.Command("sudo", "systemctl", "disable", item.Name)
+			if item.Enabled {
+				cmd = exec.Command("systemctl", "--user", "enable", item.Name)
+			} else {
+				cmd = exec.Command("systemctl", "--user", "disable", item.Name)
+			}
 		}
 
 		cmd.Run()
