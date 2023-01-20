@@ -42,7 +42,7 @@ func runCompareCmd(cmd *cobra.Command) {
 		fmt.Println("Uninstall Packages:")
 
 		for _, pkg := range uninstallPkgs {
-			fmt.Printf("\npacman -D --asexplicit %s", pkg.Name)
+			fmt.Printf("\nsudo pacman -D --asdeps %s", pkg.Name)
 		}
 	}
 
@@ -52,5 +52,5 @@ func runCompareCmd(cmd *cobra.Command) {
 		return
 	}
 
-	fmt.Println("\nnow tun `pacman -Rns $(pacman -Qtdq)`")
+	fmt.Println("\nnow tun `sudo pacman -Rns $(pacman -Qtdq)`")
 }
