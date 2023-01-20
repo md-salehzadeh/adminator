@@ -86,7 +86,7 @@ func SystemPkgs(getType bool) (packages []Package) {
 	return
 }
 
-func FilePkgs() (packages []Package) {
+func StoredPkgs() (packages []Package) {
 	configFile := filepath.Join(ConfigDir(), "packages.json")
 
 	jsonData, err := os.ReadFile(configFile)
@@ -104,28 +104,28 @@ func FilePkgs() (packages []Package) {
 
 func ComparePkgs() (installPkgs []Package, uninstallPkgs []Package) {
 	systemPkgs := SystemPkgs(false)
-	filePkgs := FilePkgs()
+	storedPkgs := StoredPkgs()
 
-	for _, filePkg := range filePkgs {
+	for _, storedPkg := range storedPkgs {
 		isInstalled := false
 
 		for _, sysPkg := range systemPkgs {
-			if sysPkg.Name == filePkg.Name {
+			if sysPkg.Name == storedPkg.Name {
 				isInstalled = true
 				break
 			}
 		}
 
 		if !isInstalled {
-			installPkgs = append(installPkgs, filePkg)
+			installPkgs = append(installPkgs, storedPkg)
 		}
 	}
 
 	for _, sysPkg := range systemPkgs {
 		shouldUninstall := true
 
-		for _, filePkg := range filePkgs {
-			if filePkg.Name == sysPkg.Name {
+		for _, storedPkg := range storedPkgs {
+			if storedPkg.Name == sysPkg.Name {
 				shouldUninstall = false
 				break
 			}
