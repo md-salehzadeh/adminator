@@ -31,9 +31,19 @@ func runCompareCmd(cmd *cobra.Command) {
 		pterm.FgLightMagenta.Println("No packages need to be installed")
 	} else {
 		for _, pkg := range installPkgs {
+			isPkgDependency := IsPkgDependency(pkg.Name)
+
+			var outStr string
+
+			if isPkgDependency {
+				outStr = fmt.Sprintf("sudo pacman -D --asexplicit %s", pkg.Name)
+			} else {
+				outStr = fmt.Sprintf("paru -%s %s", pkg.Args, pkg.Name)
+			}
+
 			bullteItems = append(bullteItems, pterm.BulletListItem{
 				Level: 0,
-				Text:  fmt.Sprintf("paru -%s %s", pkg.Args, pkg.Name),
+				Text:  outStr,
 			})
 		}
 	}

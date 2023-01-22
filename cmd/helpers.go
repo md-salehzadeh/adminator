@@ -250,6 +250,20 @@ func ServicesConfig() (items []Service) {
 	return
 }
 
+func IsPkgDependency(packageName string) bool {
+	cmd := exec.Command("pacman", "-Qi", packageName)
+
+	output, err := cmd.Output()
+
+	if err != nil {
+		return false
+	}
+
+	outputStr := string(output)
+
+	return strings.Contains(outputStr, "Depends On")
+}
+
 func Contains(list []string, str string) bool {
 	for _, item := range list {
 		if item == str {
