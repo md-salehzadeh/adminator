@@ -53,47 +53,11 @@ func SystemPkgs(getType bool) (packages []Package) {
 				return
 			}
 
-			var pkgType string
-
-			if getType {
-				cmd = exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkg))
-
-				stdout, err := cmd.Output()
-
-				if err != nil {
-					if err.Error() != "exit status 1" {
-						fmt.Println(err.Error())
-
-						return
-					}
-				}
-
-				searchResult := strings.TrimSpace(string(stdout))
-
-				if len(searchResult) > 0 {
-					pkgType = "Pacman"
-				} else {
-					pkgType = "AUR"
-				}
-			}
-
-			pkgsWithoutDep := []string{"composer", "phpmyadmin"}
-
-			var pkgArgs string
-
-			if Contains(pkgsWithoutDep, pkg) {
-				pkgArgs = "Sdd"
-			} else {
-				pkgArgs = "S"
-			}
+			pkgEntity := PkgEntity(pkg, getType)
 
 			mutex.Lock()
 
-			packages = append(packages, Package{
-				Name: pkg,
-				Type: pkgType,
-				Args: pkgArgs,
-			})
+			packages = append(packages, pkgEntity)
 
 			mutex.Unlock()
 		}(pkg)
@@ -104,6 +68,50 @@ func SystemPkgs(getType bool) (packages []Package) {
 	sort.Slice(packages, func(i, j int) bool {
 		return packages[i].Name < packages[j].Name
 	})
+
+	return
+}
+
+func PkgEntity(pkgName string, getType bool) (pkgEntity Package) {
+	var pkgType string
+
+	if getType {
+		cmd := exec.Command("pacman", "-Ss", fmt.Sprintf("^%s$", pkgName))
+
+		stdout, err := cmd.Output()
+
+		if err != nil {
+			if err.Error() != "exit status 1" {
+				fmt.Println(err.Error())
+
+				return
+			}
+		}
+
+		searchResult := strings.TrimSpace(string(stdout))
+
+		if len(searchResult) > 0 {
+			pkgType = "Pacman"
+		} else {
+			pkgType = "AUR"
+		}
+	}
+
+	pkgsWithoutDep := []string{"composer", "phpmyadmin"}
+
+	var pkgArgs string
+
+	if Contains(pkgsWithoutDep, pkgName) {
+		pkgArgs = "Sdd"
+	} else {
+		pkgArgs = "S"
+	}
+
+	pkgEntity = Package{
+		Name: pkgName,
+		Type: pkgType,
+		Args: pkgArgs,
+	}
 
 	return
 }
