@@ -7,18 +7,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var pkg string
-
 var pkgsAddCmd = &cobra.Command{
 	Use:   "add",
 	Short: "add a package to the packages file",
 	Long:  `add a package to the packages file`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var pkg string
+
 		if len(args) > 0 {
 			pkg = args[0]
 		}
 
-		runPkgsAddCmd(cmd)
+		runPkgsAddCmd(cmd, pkg)
 	},
 }
 
@@ -26,7 +26,7 @@ func init() {
 	pkgsCmd.AddCommand(pkgsAddCmd)
 }
 
-func runPkgsAddCmd(cmd *cobra.Command) {
+func runPkgsAddCmd(cmd *cobra.Command, pkg string) {
 	pterm.Println()
 
 	if pkg == "" {
