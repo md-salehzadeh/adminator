@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
 	"sort"
 
 	"github.com/pterm/pterm"
@@ -63,23 +60,7 @@ func runPkgsAddCmd(cmd *cobra.Command) {
 		return packages[i].Name < packages[j].Name
 	})
 
-	writeBackToFile(packages)
+	writeToFile(packages)
 
 	pterm.Success.Println("package successfully added to the packages file")
-}
-
-func writeBackToFile(packages []Package) {
-	jsonData, err := json.MarshalIndent(packages, "", "    ")
-
-	if err != nil {
-		panic(err)
-	}
-
-	configFile := filepath.Join(ConfigDir(), "packages.json")
-
-	err = os.WriteFile(configFile, jsonData, 0644)
-
-	if err != nil {
-		panic(err)
-	}
 }
